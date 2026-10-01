@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>PricePulse - Product Comparison</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div class="logo">
+            Price<span>Pulse</span>
+        </div>
+
+        <p>
+            Compare prices across multiple platforms
+        </p>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <main>
+
+        <div id="productDetails">
+
+            <div class="message-card">
+
+                <div class="loader"></div>
+
+                <h3>
+                    Loading product...
+                </h3>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <script
+        src="{{ url_for('static', filename='js/product.js') }}">
+    </script>
+
+</body>
+
+</html>
