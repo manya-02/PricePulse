@@ -8,56 +8,185 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>PricePulse - Price Comparison</title>
+    <title>PricePulse - Compare Prices</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 
 </head>
 
 
 <body>
 
-    <!-- HEADER -->
+    <!-- HEADER / HERO -->
 
-    <header>
+    <header class="hero">
 
-        <div class="logo">
-            Price<span>Pulse</span>
+        <div class="hero-content">
+
+            <div class="logo">
+                Price<span>Pulse</span>
+            </div>
+
+            <p class="hero-tagline">
+                Compare prices. Find the better deal.
+            </p>
+
+            <p class="hero-description">
+                Search for a product and compare prices across
+                multiple shopping platforms in one place.
+            </p>
+
+
+            <!-- SEARCH -->
+
+            <div class="search-container">
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search for a product..."
+                    autocomplete="off"
+                    onkeydown="handleEnter(event)"
+                >
+
+                <button onclick="searchProducts()">
+                    Search
+                </button>
+
+            </div>
+
+
+            <p class="search-hint">
+                Try searching for
+                <strong>iPhone 15 128GB</strong>
+            </p>
+
         </div>
-
-        <p>
-            Compare prices across multiple platforms
-        </p>
 
     </header>
 
 
-    <!-- SEARCH -->
+    <!-- MAIN CONTENT -->
 
     <main>
 
-        <div class="search-container">
+        <!-- SECTION TITLE -->
 
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="Search for a product..."
-                onkeydown="handleEnter(event)"
-            >
+        <section class="comparison-intro">
 
-            <button onclick="searchProducts()">
-                Search
-            </button>
+            <span class="section-label">
+                PRICE COMPARISON
+            </span>
 
-        </div>
+            <h1>
+                Find the right price
+            </h1>
+
+            <p>
+                PricePulse helps you compare available offers
+                and identify the lowest price quickly.
+            </p>
+
+        </section>
 
 
         <!-- RESULTS -->
 
         <div id="results"></div>
 
+
+        <!-- HOW IT WORKS -->
+
+        <section class="how-it-works">
+
+            <div class="section-heading">
+
+                <span class="section-label">
+                    HOW IT WORKS
+                </span>
+
+                <h2>
+                    Compare in three simple steps
+                </h2>
+
+            </div>
+
+
+            <div class="steps">
+
+                <div class="step-card">
+
+                    <div class="step-number">
+                        01
+                    </div>
+
+                    <h3>
+                        Search
+                    </h3>
+
+                    <p>
+                        Enter the product you want to compare.
+                    </p>
+
+                </div>
+
+
+                <div class="step-card">
+
+                    <div class="step-number">
+                        02
+                    </div>
+
+                    <h3>
+                        Compare
+                    </h3>
+
+                    <p>
+                        View offers and prices from different platforms.
+                    </p>
+
+                </div>
+
+
+                <div class="step-card">
+
+                    <div class="step-number">
+                        03
+                    </div>
+
+                    <h3>
+                        Choose
+                    </h3>
+
+                    <p>
+                        Find the offer that matches your requirements.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-logo">
+            Price<span>Pulse</span>
+        </div>
+
+        <p>
+            Smart price comparison made simple.
+        </p>
+
+    </footer>
 
 
     <script
