@@ -6,7 +6,6 @@ from .base_platform import BasePlatform
 class MockPlatform(BasePlatform):
 
     def __init__(self, name):
-
         self.name = name
 
     def search_product(self, product_name):
@@ -70,6 +69,22 @@ class MockPlatform(BasePlatform):
             50000
         )
 
+        # --------------------------------------
+        # Platform URLs
+        # --------------------------------------
+
+        platform_urls = {
+            "Amazon": "https://www.amazon.in/",
+            "Flipkart": "https://www.flipkart.com/",
+            "Blinkit": "https://blinkit.com/",
+            "Zepto": "https://www.zeptonow.com/"
+        }
+
+        product_url = platform_urls.get(
+            self.name,
+            "#"
+        )
+
         return [
 
             {
@@ -83,7 +98,7 @@ class MockPlatform(BasePlatform):
 
                 "availability": "Available",
 
-                "product_url": "https://example.com",
+                "product_url": product_url,
 
                 "last_updated": datetime.utcnow()
             }

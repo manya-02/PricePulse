@@ -1,25 +1,32 @@
+document.addEventListener("DOMContentLoaded", () => {
+
+    loadProduct();
+
+});
+
+
 async function loadProduct() {
 
-    const container =
-        document.getElementById("productDetails");
+    const container = document.getElementById("productDetails");
+
+    const pathParts = window.location.pathname.split("/");
+
+    const productId = pathParts[pathParts.length - 1];
 
 
-    // ==========================================
-    // GET PRODUCT ID
-    // ==========================================
+    if (!productId || isNaN(productId)) {
 
-    const parts =
-        window.location.pathname.split("/");
+        showError(
+            "Invalid product",
+            "The product you are looking for could not be found."
+        );
 
-    const productId =
-        parts[parts.length - 1];
+        return;
+
+    }
 
 
     try {
-
-        // ==========================================
-        // GET PRODUCT DATA
-        // ==========================================
 
         const response = await fetch(
             `/api/products/${productId}`
@@ -28,408 +35,522 @@ async function loadProduct() {
 
         if (!response.ok) {
 
-            throw new Error(
-                "Product not found"
-            );
+            throw new Error("Product not found");
 
         }
 
 
-        const product =
-            await response.json();
+        const data = await response.json();
 
 
-        // ==========================================
-        // PRODUCT IMAGE
-        // ==========================================
+        if (!data || !data.product) {
 
-        let imageHTML = "";
-
-        if (product.image_url) {
-
-            imageHTML = `
-                <img
-                    src="${product.image_url}"
-                    alt="${product.name}"
-                    class="product-image"
-                >
-            `;
-
-        } else {
-
-            imageHTML = `
-                <div class="product-image-placeholder">
-                    📦
-                </div>
-            `;
+            throw new Error("Product not found");
 
         }
 
 
-        // ==========================================
-        // CALCULATE DISCOUNT
-        // ==========================================
-
-        let discountHTML = "";
-
-
-        if (
-            product.highest_price &&
-            product.best_price &&
-            product.highest_price >
-            product.best_price
-        ) {
-
-            const discount =
-                Math.round(
-                    (
-                        (
-                            product.highest_price
-                            - product.best_price
-                        )
-                        /
-                        product.highest_price
-                    ) * 100
-                );
-
-
-            discountHTML = `
-
-                <div class="discount">
-
-                    ${discount}% lower than highest price
-
-                </div>
-
-            `;
-
-        }
-
-
-        // ==========================================
-        // OFFERS
-        // ==========================================
-
-        let offersHTML = "";
-
-
-        if (
-            product.offers &&
-            product.offers.length > 0
-        ) {
-
-            product.offers.forEach(
-                offer => {
-
-                    const lowestBadge =
-                        offer.is_lowest
-                            ? `
-                                <span class="lowest-badge">
-                                    Lowest Price
-                                </span>
-                              `
-                            : "";
-
-
-                    let originalPriceHTML = "";
-
-
-                    if (
-                        offer.original_price &&
-                        offer.original_price >
-                        offer.price
-                    ) {
-
-                        originalPriceHTML = `
-
-                            <div class="original-price">
-
-                                ₹${offer.original_price
-                                    .toLocaleString("en-IN")}
-
-                            </div>
-
-                        `;
-
-                    }
-
-
-                    offersHTML += `
-
-                        <div class="platform-card ${
-                            offer.is_lowest
-                                ? "lowest-platform"
-                                : ""
-                        }">
-
-
-                            <div class="platform-info">
-
-                                <div class="platform-name">
-
-                                    ${offer.platform}
-
-                                    ${lowestBadge}
-
-                                </div>
-
-
-                                <div class="availability">
-
-                                    ${offer.availability}
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="platform-price-section">
-
-                                ${originalPriceHTML}
-
-                                <div class="platform-price">
-
-                                    ₹${offer.price
-                                        .toLocaleString("en-IN")}
-
-                                </div>
-
-                            </div>
-
-
-                            <a
-                                href="${offer.product_url}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="buy-button"
-                            >
-                                View Deal
-                            </a>
-
-
-                        </div>
-
-                    `;
-
-                }
-            );
-
-        } else {
-
-            offersHTML = `
-
-                <div class="no-offers">
-
-                    No offers currently available.
-
-                </div>
-
-            `;
-
-        }
-
-
-        // ==========================================
-        // PRODUCT PAGE
-        // ==========================================
-
-        container.innerHTML = `
-
-            <button
-                class="back-button"
-                onclick="window.location.href='/'"
-            >
-                ← Back to Search
-            </button>
-
-
-            <div class="product-page">
-
-
-                <!-- PRODUCT INFORMATION -->
-
-                <div class="product-info-section">
-
-
-                    <div class="product-image-section">
-
-                        ${imageHTML}
-
-                    </div>
-
-
-                    <div class="product-main-info">
-
-                        <div class="category-label">
-
-                            ${product.category || "Product"}
-
-                        </div>
-
-
-                        <h1>
-
-                            ${product.name}
-
-                        </h1>
-
-
-                        <div class="product-meta">
-
-                            <span>
-                                Brand: ${product.brand || "N/A"}
-                            </span>
-
-                            <span>
-                                Storage: ${product.storage || "N/A"}
-                            </span>
-
-                            <span>
-                                Color: ${product.color || "N/A"}
-                            </span>
-
-                        </div>
-
-
-                        <p class="product-description">
-
-                            ${product.description || ""}
-
-                        </p>
-
-
-                        <div class="best-price-large">
-
-
-                            <div class="best-price-label">
-
-                                Best Available Price
-
-                            </div>
-
-
-                            <div class="best-price-large-value">
-
-                                ${
-                                    product.best_price !== null
-                                    ? "₹" +
-                                      product.best_price
-                                      .toLocaleString("en-IN")
-                                    : "Not available"
-                                }
-
-                            </div>
-
-
-                            <div class="best-platform">
-
-                                ${
-                                    product.best_platform
-                                    || ""
-                                }
-
-                            </div>
-
-
-                            ${discountHTML}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- PRICE COMPARISON -->
-
-                <div class="comparison-section">
-
-
-                    <div class="comparison-header">
-
-                        <div>
-
-                            <h2>
-                                Price Comparison
-                            </h2>
-
-                            <p>
-                                Compare prices from
-                                ${product.offer_count}
-                                platforms
-                            </p>
-
-                        </div>
-
-
-                        <div class="total-savings">
-
-                            Save up to
-
-                            <strong>
-                                ₹${product.total_savings
-                                    .toLocaleString("en-IN")}
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="platform-list">
-
-                        ${offersHTML}
-
-                    </div>
-
-                </div>
-
-
-            </div>
-
-        `;
+        displayProduct(data);
 
     }
 
-
     catch (error) {
 
-        console.error(
-            "Product loading error:",
-            error
+        console.error(error);
+
+        showError(
+            "Product not found",
+            "We could not find this product."
         );
-
-
-        container.innerHTML = `
-
-            <div class="message-card error-card">
-
-                <h3>
-                    Product not found
-                </h3>
-
-                <p>
-                    We couldn't load this product.
-                </p>
-
-
-                <button
-                    onclick="window.location.href='/'"
-                >
-                    Back to Search
-                </button>
-
-            </div>
-
-        `;
 
     }
 
 }
 
 
-// ==========================================
-// LOAD PRODUCT
-// ==========================================
+function displayProduct(data) {
 
-loadProduct();
+    const container = document.getElementById("productDetails");
+
+    const product = data.product;
+
+    const offers = data.offers || [];
+
+
+    const lowestPrice = data.lowest_price;
+
+    const highestPrice = data.highest_price;
+
+    const savings = data.savings;
+
+    const savingPercentage = data.saving_percentage;
+
+
+    let offersHTML = "";
+
+
+    if (offers.length === 0) {
+
+        offersHTML = `
+            <div class="message-card">
+
+                <h3>
+                    No offers available
+                </h3>
+
+                <p>
+                    There are currently no available offers
+                    for this product.
+                </p>
+
+            </div>
+        `;
+
+    }
+
+    else {
+
+        offersHTML = offers.map((offer, index) => {
+
+            const price = formatPrice(offer.price);
+
+            const originalPrice =
+                offer.original_price
+                    ? formatPrice(offer.original_price)
+                    : "";
+
+            const isLowest =
+                index === 0 ||
+                offer.price === lowestPrice;
+
+
+            return `
+
+                <div class="platform-card
+                    ${isLowest ? "best-deal" : ""}">
+
+                    <div class="platform-card-top">
+
+                        <div>
+
+                            <div class="platform-name">
+
+                                ${escapeHTML(
+                                    offer.platform || "Platform"
+                                )}
+
+                            </div>
+
+                            ${
+                                isLowest
+                                ? `
+                                    <span class="best-price-badge">
+                                        LOWEST PRICE
+                                    </span>
+                                  `
+                                : ""
+                            }
+
+                        </div>
+
+
+                        <div class="availability">
+
+                            ${
+                                offer.availability
+                                    ? escapeHTML(
+                                        offer.availability
+                                      )
+                                    : "Available"
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="platform-price">
+
+                        <span class="current-price">
+                            ₹${price}
+                        </span>
+
+                        ${
+                            originalPrice
+                                ? `
+                                    <span class="original-price">
+                                        ₹${originalPrice}
+                                    </span>
+                                  `
+                                : ""
+                        }
+
+                    </div>
+
+
+                    ${
+                        offer.original_price &&
+                        offer.original_price > offer.price
+                            ? `
+                                <div class="offer-saving">
+
+                                    Save ₹${formatPrice(
+                                        offer.original_price -
+                                        offer.price
+                                    )}
+
+                                </div>
+                              `
+                            : ""
+                    }
+
+
+                    <a
+                        href="${offer.product_url || "#"}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="buy-button"
+                        ${
+                            !offer.product_url
+                                ? 'onclick="return false;"'
+                                : ""
+                        }
+                    >
+
+                        View Deal →
+
+                    </a>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+    }
+
+
+    container.innerHTML = `
+
+        <section class="product-page">
+
+
+            <!-- PRODUCT INFORMATION -->
+
+            <div class="product-overview">
+
+
+                <div class="product-image-area">
+
+                    ${
+                        product.image_url
+                            ? `
+                                <img
+                                    src="${escapeHTML(
+                                        product.image_url
+                                    )}"
+                                    alt="${escapeHTML(
+                                        product.name
+                                    )}"
+                                    class="product-image"
+                                >
+                              `
+                            : `
+                                <div class="product-image-placeholder">
+
+                                    <span>PRODUCT</span>
+
+                                </div>
+                              `
+                    }
+
+                </div>
+
+
+                <div class="product-information">
+
+                    <span class="section-label">
+                        PRODUCT DETAILS
+                    </span>
+
+
+                    <h1>
+                        ${escapeHTML(product.name)}
+                    </h1>
+
+
+                    ${
+                        product.brand
+                            ? `
+                                <p class="product-brand">
+                                    ${escapeHTML(product.brand)}
+                                </p>
+                              `
+                            : ""
+                    }
+
+
+                    <div class="product-meta">
+
+                        ${
+                            product.storage
+                                ? `
+                                    <span>
+                                        ${escapeHTML(
+                                            product.storage
+                                        )}
+                                    </span>
+                                  `
+                                : ""
+                        }
+
+                        ${
+                            product.color
+                                ? `
+                                    <span>
+                                        ${escapeHTML(
+                                            product.color
+                                        )}
+                                    </span>
+                                  `
+                                : ""
+                        }
+
+                        ${
+                            product.category
+                                ? `
+                                    <span>
+                                        ${escapeHTML(
+                                            product.category
+                                        )}
+                                    </span>
+                                  `
+                                : ""
+                        }
+
+                    </div>
+
+
+                    ${
+                        product.description
+                            ? `
+                                <p class="product-description">
+                                    ${escapeHTML(
+                                        product.description
+                                    )}
+                                </p>
+                              `
+                            : ""
+                    }
+
+
+                    <div class="product-summary">
+
+                        <div class="summary-item">
+
+                            <span>
+                                Lowest price
+                            </span>
+
+                            <strong>
+                                ${
+                                    lowestPrice !== null &&
+                                    lowestPrice !== undefined
+                                        ? `₹${formatPrice(
+                                            lowestPrice
+                                          )}`
+                                        : "—"
+                                }
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-item">
+
+                            <span>
+                                Highest price
+                            </span>
+
+                            <strong>
+                                ${
+                                    highestPrice !== null &&
+                                    highestPrice !== undefined
+                                        ? `₹${formatPrice(
+                                            highestPrice
+                                          )}`
+                                        : "—"
+                                }
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-item">
+
+                            <span>
+                                Maximum savings
+                            </span>
+
+                            <strong>
+                                ${
+                                    savings !== null &&
+                                    savings !== undefined
+                                        ? `₹${formatPrice(
+                                            savings
+                                          )}`
+                                        : "—"
+                                }
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-item">
+
+                            <span>
+                                Savings
+                            </span>
+
+                            <strong>
+                                ${
+                                    savingPercentage !== null &&
+                                    savingPercentage !== undefined
+                                        ? `${Number(
+                                            savingPercentage
+                                          ).toFixed(1)}%`
+                                        : "—"
+                                }
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PLATFORM COMPARISON -->
+
+            <section class="comparison-section">
+
+                <div class="section-heading">
+
+                    <span class="section-label">
+                        PRICE COMPARISON
+                    </span>
+
+                    <h2>
+                        Compare available offers
+                    </h2>
+
+                    <p>
+                        Check the available prices across
+                        different shopping platforms.
+                    </p>
+
+                </div>
+
+
+                <div class="platform-grid">
+
+                    ${offersHTML}
+
+                </div>
+
+            </section>
+
+
+            <!-- BACK BUTTON -->
+
+            <div class="product-actions">
+
+                <a
+                    href="/"
+                    class="back-button"
+                >
+                    ← Search another product
+                </a>
+
+            </div>
+
+
+        </section>
+
+    `;
+
+}
+
+
+function showError(title, message) {
+
+    const container =
+        document.getElementById("productDetails");
+
+
+    container.innerHTML = `
+
+        <div class="message-card error-card">
+
+            <div class="error-icon">
+                !
+            </div>
+
+            <h2>
+                ${escapeHTML(title)}
+            </h2>
+
+            <p>
+                ${escapeHTML(message)}
+            </p>
+
+            <a
+                href="/"
+                class="back-button"
+            >
+                ← Back to search
+            </a>
+
+        </div>
+
+    `;
+
+}
+
+
+function formatPrice(value) {
+
+    const number = Number(value);
+
+
+    if (isNaN(number)) {
+
+        return "0";
+
+    }
+
+
+    return number.toLocaleString("en-IN");
+
+}
+
+
+function escapeHTML(value) {
+
+    if (value === null || value === undefined) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}

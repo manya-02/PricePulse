@@ -2,11 +2,8 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>PricePulse - Compare Prices</title>
 
@@ -14,13 +11,15 @@
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
     >
-
 </head>
 
+<a href="#" class="back-to-top" aria-label="Back to top">
+    ↑
+</a>
 
 <body>
 
-    <!-- HEADER / HERO -->
+    <!-- ================= HEADER ================= -->
 
     <header class="hero">
 
@@ -39,6 +38,9 @@
                 multiple shopping platforms in one place.
             </p>
 
+            <a href="#how-it-works" class="how-it-works-button">
+                How It Works ↓
+            </a>
 
             <!-- SEARCH -->
 
@@ -58,7 +60,6 @@
 
             </div>
 
-
             <p class="search-hint">
                 Try searching for
                 <strong>iPhone 15 128GB</strong>
@@ -69,11 +70,11 @@
     </header>
 
 
-    <!-- MAIN CONTENT -->
+    <!-- ================= MAIN ================= -->
 
     <main>
 
-        <!-- SECTION TITLE -->
+        <!-- INTRO -->
 
         <section class="comparison-intro">
 
@@ -93,14 +94,406 @@
         </section>
 
 
-        <!-- RESULTS -->
+        <!-- ================= CATEGORIES ================= -->
 
-        <div id="results"></div>
+        <section class="categories-section">
+
+            <div class="section-heading">
+
+                <span class="section-label">
+                    BROWSE CATEGORIES
+                </span>
+
+                <h2>
+                    What are you looking for?
+                </h2>
+
+                <p>
+                    Choose a category to explore products and compare prices.
+                </p>
+
+            </div>
 
 
-        <!-- HOW IT WORKS -->
+            <div class="category-grid">
 
-        <section class="how-it-works">
+
+                <!-- MOBILE -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('mobile')"
+                >
+
+                    <div class="category-icon">
+                        📱
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Mobiles
+                        </h3>
+
+                        <p>
+                            Smartphones & phones
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- LAPTOP -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('laptop')"
+                >
+
+                    <div class="category-icon">
+                        💻
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Laptops
+                        </h3>
+
+                        <p>
+                            Work & gaming laptops
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- AUDIO -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('audio')"
+                >
+
+                    <div class="category-icon">
+                        🎧
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Audio
+                        </h3>
+
+                        <p>
+                            Earbuds & headphones
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- SMARTWATCH -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('smartwatch')"
+                >
+
+                    <div class="category-icon">
+                        ⌚
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Smartwatches
+                        </h3>
+
+                        <p>
+                            Watches & fitness bands
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- TV -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('tv')"
+                >
+
+                    <div class="category-icon">
+                        📺
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            TVs
+                        </h3>
+
+                        <p>
+                            Smart TVs & displays
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- GAMING -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('gaming')"
+                >
+
+                    <div class="category-icon">
+                        🎮
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Gaming
+                        </h3>
+
+                        <p>
+                            Consoles & accessories
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- MONITORS -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('monitor')"
+                >
+
+                    <div class="category-icon">
+                        🖥️
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Monitors
+                        </h3>
+
+                        <p>
+                            Displays for work & gaming
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- CAMERAS -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('camera')"
+                >
+
+                    <div class="category-icon">
+                        📷
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Cameras
+                        </h3>
+
+                        <p>
+                            Cameras & action cams
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- ACCESSORIES -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('accessories')"
+                >
+
+                    <div class="category-icon">
+                        ⌨️
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Accessories
+                        </h3>
+
+                        <p>
+                            Keyboards, mice & more
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- HOME -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('home appliance')"
+                >
+
+                    <div class="category-icon">
+                        🏠
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Home Appliances
+                        </h3>
+
+                        <p>
+                            Appliances for your home
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- KITCHEN -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('kitchen')"
+                >
+
+                    <div class="category-icon">
+                        🍳
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Kitchen
+                        </h3>
+
+                        <p>
+                            Kitchen appliances
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+
+                <!-- PERSONAL CARE -->
+
+                <button
+                    class="category-card"
+                    onclick="searchCategory('personal care')"
+                >
+
+                    <div class="category-icon">
+                        ✨
+                    </div>
+
+                    <div class="category-info">
+
+                        <h3>
+                            Personal Care
+                        </h3>
+
+                        <p>
+                            Grooming & beauty
+                        </p>
+
+                    </div>
+
+                    <span class="category-arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= RESULTS ================= -->
+
+        <section class="results-section">
+
+            <div id="results"></div>
+
+        </section>
+
+
+        <!-- ================= HOW IT WORKS ================= -->
+
+        <section class="how-it-works" id="how-it-works">
 
             <div class="section-heading">
 
@@ -116,6 +509,7 @@
 
 
             <div class="steps">
+
 
                 <div class="step-card">
 
@@ -167,6 +561,7 @@
 
                 </div>
 
+
             </div>
 
         </section>
@@ -174,7 +569,7 @@
     </main>
 
 
-    <!-- FOOTER -->
+    <!-- ================= FOOTER ================= -->
 
     <footer>
 
@@ -182,11 +577,32 @@
             Price<span>Pulse</span>
         </div>
 
-        <p>
-            Smart price comparison made simple.
-        </p>
-
+            <p class="copyright">
+                © ManyaAggarwal. All rights reserved.
+            </p>
     </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        function searchCategory(category) {
+
+            const searchInput =
+                document.getElementById("searchInput");
+
+            searchInput.value = category;
+
+            searchProducts();
+
+            window.scrollTo({
+                top: document.getElementById("results").offsetTop - 40,
+                behavior: "smooth"
+            });
+        }
+
+    </script>
 
 
     <script

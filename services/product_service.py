@@ -9,7 +9,9 @@ from services.product_matcher import (
     extract_storage,
     extract_model_number,
     extract_brand,
-    extract_color
+    extract_color,
+    normalize_product_name,
+    get_tokens
 )
 
 
@@ -19,25 +21,162 @@ def find_matching_products(query):
 
     matches = []
 
-    query_storage = extract_storage(
-        query
-    )
+    query = query.strip()
 
-    query_model = extract_model_number(
-        query
-    )
+    if not query:
+        return []
 
-    query_brand = extract_brand(
-        query
-    )
 
-    query_color = extract_color(
-        query
-    )
+    # ---------------------------------------------------------
+    # QUERY INFORMATION
+    # ---------------------------------------------------------
+
+    query_storage = extract_storage(query)
+
+    query_model = extract_model_number(query)
+
+    query_brand = extract_brand(query)
+
+    query_color = extract_color(query)
+
+    query_tokens = get_tokens(query)
+
+
+    # ---------------------------------------------------------
+    # CATEGORY ALIASES
+    # ---------------------------------------------------------
+
+    category_aliases = {
+
+        "mobile": {
+            "mobile",
+            "mobiles",
+            "phone",
+            "phones",
+            "smartphone",
+            "smartphones"
+        },
+
+        "laptop": {
+            "laptop",
+            "laptops",
+            "notebook",
+            "notebooks"
+        },
+
+        "audio": {
+            "audio",
+            "earbud",
+            "earbuds",
+            "headphone",
+            "headphones",
+            "airpods"
+        },
+
+        "smartwatch": {
+            "smartwatch",
+            "smartwatches",
+            "watch",
+            "watches"
+        },
+
+        "television": {
+            "tv",
+            "television",
+            "televisions"
+        },
+
+        "gaming": {
+            "gaming",
+            "game",
+            "games",
+            "console",
+            "consoles"
+        },
+
+        "monitor": {
+            "monitor",
+            "monitors",
+            "display",
+            "displays"
+        },
+
+        "camera": {
+            "camera",
+            "cameras"
+        },
+
+        "accessories": {
+            "accessory",
+            "accessories",
+            "keyboard",
+            "keyboards",
+            "mouse",
+            "mice"
+        },
+
+        "home appliance": {
+            "appliance",
+            "appliances",
+            "vacuum",
+            "purifier",
+            "washing",
+            "washingmachine",
+            "fan"
+        },
+
+        "kitchen appliance": {
+            "kitchen",
+            "microwave",
+            "airfryer",
+            "air",
+            "fryer"
+        },
+
+        "personal care": {
+            "personal",
+            "care",
+            "trimmer",
+            "hairdryer",
+            "dryer"
+        }
+
+    }
+
+
+    # ---------------------------------------------------------
+    # FIND CATEGORY FROM QUERY
+    # ---------------------------------------------------------
+
+    query_category = None
+
+    normalized_query = normalize_product_name(query)
+
+    for category, aliases in category_aliases.items():
+
+        query_words = set(
+            normalized_query.split()
+        )
+
+        if query_words.intersection(aliases):
+
+            query_category = category
+
+            break
+
+
+    # ---------------------------------------------------------
+    # CHECK EACH PRODUCT
+    # ---------------------------------------------------------
 
     for product in products:
 
-        product_text = product.name
+        # -----------------------------------------------------
+        # BUILD PRODUCT SEARCH TEXT
+        # -----------------------------------------------------
+
+        product_text = product.name or ""
+
 
         if product.brand:
 
@@ -45,11 +184,20 @@ def find_matching_products(query):
                 " " + product.brand
             )
 
+
+        if product.category:
+
+            product_text += (
+                " " + product.category
+            )
+
+
         if product.storage:
 
             product_text += (
                 " " + product.storage
             )
+
 
         if product.color:
 
@@ -57,20 +205,115 @@ def find_matching_products(query):
                 " " + product.color
             )
 
-        score = similarity_score(
-            query,
+
+        if product.model_number:
+
+            product_text += (
+                " " + product.model_number
+            )
+
+
+        # -----------------------------------------------------
+        # NORMALIZED PRODUCT TOKENS
+        # -----------------------------------------------------
+
+        product_tokens = get_tokens(
             product_text
         )
 
-        # ----------------------------------
-        # Storage filter
-        # ----------------------------------
+
+        matching_tokens = (
+            query_tokens.intersection(
+                product_tokens
+            )
+        )
+
+
+        all_query_tokens_present = all(
+
+            token in product_tokens
+
+            for token in query_tokens
+
+        )
+
+
+        # -----------------------------------------------------
+        # CATEGORY MATCH
+        # -----------------------------------------------------
+
+        category_match = False
+
+
+        if query_category:
+
+            database_category = (
+                (product.category or "")
+                .lower()
+                .strip()
+            )
+
+
+            # Direct category match
+
+            if database_category == query_category:
+
+                category_match = True
+
+
+            # Home appliance aliases
+
+            elif (
+                query_category == "home appliance"
+                and database_category == "home appliance"
+            ):
+
+                category_match = True
+
+
+            # Kitchen appliance
+
+            elif (
+                query_category == "kitchen appliance"
+                and database_category == "kitchen appliance"
+            ):
+
+                category_match = True
+
+
+            # Personal care
+
+            elif (
+                query_category == "personal care"
+                and database_category == "personal care"
+            ):
+
+                category_match = True
+
+
+        # -----------------------------------------------------
+        # SIMILARITY SCORE
+        # -----------------------------------------------------
+
+        score = similarity_score(
+
+            query,
+
+            product_text
+
+        )
+
+
+        # -----------------------------------------------------
+        # STORAGE FILTER
+        # -----------------------------------------------------
 
         if query_storage:
 
             if not product.storage:
 
                 continue
+
 
             if (
                 product.storage.lower()
@@ -79,9 +322,10 @@ def find_matching_products(query):
 
                 continue
 
-        # ----------------------------------
-        # Model filter
-        # ----------------------------------
+
+        # -----------------------------------------------------
+        # MODEL FILTER
+        # -----------------------------------------------------
 
         if query_model:
 
@@ -89,19 +333,22 @@ def find_matching_products(query):
 
                 continue
 
+
             database_model = (
                 extract_model_number(
                     product.model_number
                 )
             )
 
+
             if database_model != query_model:
 
                 continue
 
-        # ----------------------------------
-        # Brand filter
-        # ----------------------------------
+
+        # -----------------------------------------------------
+        # BRAND FILTER
+        # -----------------------------------------------------
 
         if query_brand:
 
@@ -109,17 +356,20 @@ def find_matching_products(query):
 
                 continue
 
+
             database_brand = (
                 product.brand.lower()
             )
+
 
             if database_brand != query_brand:
 
                 continue
 
-        # ----------------------------------
-        # Color filter
-        # ----------------------------------
+
+        # -----------------------------------------------------
+        # COLOR FILTER
+        # -----------------------------------------------------
 
         if query_color:
 
@@ -127,33 +377,110 @@ def find_matching_products(query):
 
                 continue
 
+
             database_color = (
                 product.color.lower()
             )
+
 
             if database_color != query_color:
 
                 continue
 
-        # ----------------------------------
-        # Minimum similarity
-        # ----------------------------------
 
-        if score < 30:
+        # -----------------------------------------------------
+        # CATEGORY SEARCH
+        # -----------------------------------------------------
+
+        if category_match:
+
+            search_score = max(
+
+                score,
+
+                75
+
+            )
+
+
+        # -----------------------------------------------------
+        # EXACT TOKEN MATCH
+        # -----------------------------------------------------
+
+        elif all_query_tokens_present:
+
+            search_score = max(
+
+                score,
+
+                70
+
+            )
+
+
+        # -----------------------------------------------------
+        # PARTIAL TOKEN MATCH
+        # -----------------------------------------------------
+
+        elif matching_tokens:
+
+            token_ratio = (
+
+                len(matching_tokens)
+
+                /
+
+                len(query_tokens)
+
+            )
+
+
+            search_score = max(
+
+                score,
+
+                token_ratio * 60
+
+            )
+
+
+        else:
+
+            search_score = score
+
+
+        # -----------------------------------------------------
+        # MINIMUM SCORE
+        # -----------------------------------------------------
+
+        if search_score < 30:
 
             continue
 
+
+        # -----------------------------------------------------
+        # ADD RESULT
+        # -----------------------------------------------------
+
         matches.append({
 
-            "product":
-                product,
+            "product": product,
 
-            "score":
-                score
+            "score": round(
+
+                search_score,
+
+                2
+
+            )
 
         })
 
-    # Highest score first
+
+    # ---------------------------------------------------------
+    # SORT RESULTS
+    # ---------------------------------------------------------
+
     matches.sort(
 
         key=lambda x: x["score"],
@@ -162,7 +489,14 @@ def find_matching_products(query):
 
     )
 
+
     return matches
+
+
+
+# =============================================================
+# PLATFORM PRODUCT MATCHING
+# =============================================================
 
 def find_platform_product_match(
     platform_product_name
@@ -171,6 +505,7 @@ def find_platform_product_match(
     products = Product.query.all()
 
     matches = []
+
 
     for product in products:
 
@@ -182,17 +517,17 @@ def find_platform_product_match(
 
         )
 
+
         if result["matched"]:
 
             matches.append({
 
-                "product":
-                    product,
+                "product": product,
 
-                "score":
-                    result["score"]
+                "score": result["score"]
 
             })
+
 
     matches.sort(
 
@@ -201,5 +536,6 @@ def find_platform_product_match(
         reverse=True
 
     )
+
 
     return matches

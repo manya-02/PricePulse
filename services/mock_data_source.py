@@ -100,6 +100,27 @@ class MockDataSource(DataSource):
             50000
         )
 
+        # ----------------------------------
+        # Platform URLs
+        # ----------------------------------
+
+        platform_urls = {
+
+            "Amazon": "https://www.amazon.in/",
+
+            "Flipkart": "https://www.flipkart.com/",
+
+            "Blinkit": "https://blinkit.com/",
+
+            "Zepto": "https://www.zeptonow.com/"
+
+        }
+
+        product_url = platform_urls.get(
+            platform_name,
+            "#"
+        )
+
         return [
 
             create_offer(
@@ -114,7 +135,7 @@ class MockDataSource(DataSource):
 
                 availability="Available",
 
-                product_url=None,
+                product_url=product_url,
 
                 image_url=None
 
